@@ -17,7 +17,7 @@ class GestureTracker:
         return self.points.copy()
 
     def detect_gesture(self):
-        if len(self.points) < 15:
+        if len(self.points) < 30:  # Plus de points requis
             return None
 
         points = self._get_smoothed_points()
@@ -31,9 +31,9 @@ class GestureTracker:
 
     def _get_smoothed_points(self):
         points = np.array(self.points)
-        if len(points) >= 7:
-            x_smooth = savgol_filter(points[:, 0], 7, 2)
-            y_smooth = savgol_filter(points[:, 1], 7, 2)
+        if len(points) >= 21:  # Fenêtre plus grande pour un lissage plus fort
+            x_smooth = savgol_filter(points[:, 0], 21, 3)
+            y_smooth = savgol_filter(points[:, 1], 21, 3)
             return np.stack([x_smooth, y_smooth], axis=1)
         return points
 
@@ -50,8 +50,8 @@ class GestureTracker:
         cx, cy = np.mean(points, axis=0)
         distances = np.sqrt((points[:, 0] - cx) ** 2 + (points[:, 1] - cy) ** 2)
         variance = np.var(distances)
-        is_closed = np.linalg.norm(points[0] - points[-1]) < 0.2
-        return variance < 0.01 and is_closed
+        is_closed = np.linalg.norm(points[0] - points[-1]) < 0.25  # Tolérance augmentée
+        return variance < 0.02 and is_closed  # Variance augmentée
 
     def _is_line(self, points):
         x = points[:, 0]
@@ -60,4 +60,4 @@ class GestureTracker:
         m, c = np.linalg.lstsq(A, y, rcond=None)[0]
         y_fit = m * x + c
         error = np.mean((y - y_fit) ** 2)
-        return error < 0.002
+        return error < 0.004  # Tolérance augmentée

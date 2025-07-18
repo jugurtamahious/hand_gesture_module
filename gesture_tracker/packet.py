@@ -13,7 +13,5 @@ def grid_to_entities(grid, r=255, g=255, b=0):
             eid = coord_to_entity(x, y, size)
             if grid[y][x]:
                 entities.append([eid, r, g, b])
-            else:
-                entities.append([eid, 0, 0, 0])
 
     return entities

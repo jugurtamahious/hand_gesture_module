@@ -20,7 +20,7 @@ class UDPSender:
             # Compression
             if compress:
                 payload = gzip.compress(json_data)
-                msg_type = 2  # Type 2 = compressé
+                msg_type = 3 # Type 2 = compressé
                 original_size = len(json_data)
                 compressed_size = len(payload)
                 compression_ratio = (1 - compressed_size / original_size) * 100
